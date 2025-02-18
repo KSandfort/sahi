@@ -109,13 +109,16 @@ class DetectionModel:
 
             empty_cuda_cache()
 
-    def perform_inference(self, image: np.ndarray):
+    def perform_inference(self, image: np.ndarray, text_input: Optional[List]):
         """
         This function should be implemented in a way that prediction should be
         performed using self.model and the prediction result should be set to self._original_predictions.
         Args:
             image: np.ndarray
                 A numpy array that contains the image to be predicted.
+            text_input: List
+                A list of strings that is used for open vocabulary models that predict objects based on text input.
+                An example is the OwlViT model: https://huggingface.co/docs/transformers/v4.23.0/en/model_doc/owlvit
         """
         raise NotImplementedError()
 

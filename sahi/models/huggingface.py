@@ -90,12 +90,15 @@ class HuggingfaceDetectionModel(DetectionModel):
         self._processor = processor
         self.category_mapping = self.model.config.id2label
 
-    def perform_inference(self, image: Union[List, np.ndarray]):
+    def perform_inference(self, image: Union[List, np.ndarray], text_input: Optional[List]):
         """
         Prediction is performed using self.model and the prediction result is set to self._original_predictions.
         Args:
             image: np.ndarray
                 A numpy array that contains the image to be predicted. 3 channel image should be in RGB order.
+            text_input: List
+                A list of strings that is used for open vocabulary models that predict objects based on text input.
+                An example is the OwlViT model: https://huggingface.co/docs/transformers/v4.23.0/en/model_doc/owlvit
         """
         import torch
 
@@ -104,7 +107,10 @@ class HuggingfaceDetectionModel(DetectionModel):
             raise RuntimeError("Model is not loaded, load it by calling .load_model()")
 
         with torch.no_grad():
-            inputs = self.processor(images=image, return_tensors="pt")
+            if text_input is None:
+                inputs = self.processor(images=image, return_tensors="pt").to(self.device)
+            else:
+                inputs = self.processor(text=text_input, images=image, return_tensors="pt").to(self.device)
             inputs["pixel_values"] = inputs.pixel_values.to(self.device)
             if hasattr(inputs, "pixel_mask"):
                 inputs["pixel_mask"] = inputs.pixel_mask.to(self.device)
