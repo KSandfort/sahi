@@ -93,7 +93,10 @@ def get_prediction(
     image_as_pil = read_image_as_pil(image)
     # get prediction
     time_start = time.time()
-    detection_model.perform_inference(np.ascontiguousarray(image_as_pil), text_input)
+    if text_input is not None:
+        detection_model.perform_inference(np.ascontiguousarray(image_as_pil), text_input)
+    else:
+        detection_model.perform_inference(np.ascontiguousarray(image_as_pil))
     time_end = time.time() - time_start
     durations_in_seconds["prediction"] = time_end
 
